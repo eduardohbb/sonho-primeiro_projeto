@@ -14,25 +14,35 @@
 
 import math
 
-#target: (x_real, y_real, yaw_real)
-#current: (x_target, y_target, yaw_target)
+#current: (x_real, y_real, yaw_real)
+#target: (x_target, y_target, yaw_target)
 
-def calculate_velocity(target, current):
- 
-   x_target = target[0]
-   y_target = target[1]
-   yaw_target = target[2]
+def euler_modificado(V:float, omega:float, dt: float, target: dict) -> tuple:
 
-   x_real = current[0]
-   y_real = current[1]
-   yam_real = current[2]
+   #Diminir a Linha pra n ficar grande
+   dTheta = omega * dt
+   Vxdt = V*dt
 
-   dy = y_target - y_real
-   dx = x_target - x_real
-   distancia = math.sqrt(dy**2 + dx**2)
+   #Euler Modificado
+   x_k1 = target["x_k"] + math.cos(target["theta_k"] + dTheta/2)*Vxdt
+   y_k1 = target["y_k"] + math.sin(target["theta_k"] + dTheta/2)*Vxdt
+   theta_k1 = target["theta_k"] + dTheta
 
+   return x_k1,y_k1,theta_k1
+   
+def calculate_velocity(target: tuple, current: tuple) -> tuple:
 
    vel = [0.0, 0.0]
     #   vx  omega
 
    return vel
+
+valores = (0.0, 0.0, 0.0)
+coordenates = ("x_k", "y_k", "theta_k")
+target = dict(zip(coordenates, valores))
+
+for i in range(1000):
+    x_k1, y_k1, theta_k1 = euler_modificado(omega=0.3, V=1.0, dt=0.5, target=target)
+    target = {"x_k": x_k1, "y_k": y_k1, "theta_k": theta_k1}
+
+print(target)
